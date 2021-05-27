@@ -1,0 +1,11 @@
+{application, echiapos, [
+  {description, "NIF binding for ChiaPOS"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+    kernel,
+    stdlib
+  ]},
+  %% {mod, {echiapos, []}},
+  {env, []}
+]}.
