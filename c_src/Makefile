@@ -1,6 +1,6 @@
 # Based on c_src.mk from erlang.mk by Loic Hoguin <essen@ninenines.eu>
 
-PROJECT := erl_signal_nif
+PROJECT := echiapos_nif
 
 CURDIR := $(shell pwd)
 BASEDIR := $(abspath $(CURDIR)/..)
@@ -12,7 +12,7 @@ ERTS_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts/ert
 ERL_INTERFACE_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(erl_interface, include)]).")
 ERL_INTERFACE_LIB_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(erl_interface, lib)]).")
 
-C_SRC_DIR = $(CURDIR) $(CURDIR)/libsignal-c
+C_SRC_DIR = $(CURDIR) $(CURDIR)/chiapos
 C_SRC_OUTPUT ?= $(CURDIR)/../priv/$(PROJECT).so
 
 # System type and C compiler/flags.
@@ -36,10 +36,8 @@ endif
 CFLAGS += -fPIC -I $(ERTS_INCLUDE_DIR) -I $(ERL_INTERFACE_INCLUDE_DIR) -I /usr/include/glib-2.0 -I /usr/lib/x86_64-linux-gnu/glib-2.0/include -I /usr/include/c++/6/ -I /usr/include/x86_64-linux-gnu/c++/6/
 CXXFLAGS += -fPIC -I $(ERTS_INCLUDE_DIR) -I $(ERL_INTERFACE_INCLUDE_DIR) -I /usr/include/glib-2.0 -I /usr/lib/x86_64-linux-gnu/glib-2.0/include -I /usr/include/c++/6/ -I /usr/include/x86_64-linux-gnu/c++/6/
 
-LDLIBS += -L ../libs/cJSON 
-LDLIBS += -L ../libs/libsignal-protocol-c/build/src -lsignal-protocol-c
-LDLIBS += -L $(ERL_INTERFACE_LIB_DIR) -lerl_interface -lei
-LDLIBS += -L /usr/lib32 -lgcrypt
+LDLIBS += -L $(ERL_INTERFACE_LIB_DIR) -lei
+LDLIBS += -L ../
 # LDLIBS += -L /usr/lib32 -lglib
 
 
@@ -59,9 +57,10 @@ link_verbose = $(link_verbose_$(V))
 SOURCES := $(shell find $(C_SRC_DIR) -type f \( -name "*.c" -o -name "*.C" -o -name "*.cc" -o -name "*.cpp" \))
 OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 # OBJECTS += $(shell find ../libs/libsignal-protocol-c/build/src -type f \( -name "*.o" \))
+OBJECTS += $(shell find ../libs/chiapos/CMakeFiles/fse.dir -type f \( -name "*.o" \))
 
 
-COMPILE_C = CPATH=CPATH:libsignal-c $(c_verbose) $(CC) $(CFLAGS) $(CPPFLAGS) -c
+COMPILE_C = CPATH=CPATH: $(c_verbose) $(CC) $(CFLAGS) $(CPPFLAGS) -c
 COMPILE_CPP = $(cpp_verbose) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 
 $(C_SRC_OUTPUT): Makefile $(OBJECTS)
