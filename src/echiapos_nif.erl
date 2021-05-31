@@ -1,8 +1,8 @@
 -module(echiapos_nif).
 
 -export([
-  'Encoding_ANSEncodeDeltas'/2,
-  'Encoding_ANSDecodeDeltas'/3
+  encoding_ans_encode_deltas/2,
+  encoding_ans_decode_deltas/3
 ]).
 
 -on_load(init/0).
@@ -22,8 +22,8 @@ init() ->
   erlang:load_nif(SoName, 0).
 
 
-'Encoding_ANSEncodeDeltas'(_Deltas, _R) ->
+encoding_ans_encode_deltas(_Deltas, _R) ->
   erlang:nif_error({error, not_loaded}).
 
-'Encoding_ANSDecodeDeltas'(_Binary, _NumDeltas, _R) ->
+encoding_ans_decode_deltas(_Binary, _NumDeltas, _R) ->
   erlang:nif_error({error, not_loaded}).

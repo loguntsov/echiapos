@@ -4,6 +4,8 @@
 
 #include "../libs/chiapos/src/encoding.hpp"
 
+#define BUFFER_SIZE 6047
+
 extern "C" {
     ERL_NIF_TERM nif_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
     ERL_NIF_TERM nif_ANSDecodeDeltas(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
@@ -36,7 +38,7 @@ ERL_NIF_TERM nif_Encoding_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NI
     std::vector<unsigned char> deltas;
     deltas.assign((char *) deltas_bin.data, ((char *) deltas_bin.data) + deltas_bin.size);
 
-    uint8_t out[100000];
+    uint8_t out[BUFFER_SIZE];
 
     size_t size;
     try {
@@ -70,8 +72,8 @@ extern "C" {
 	int on_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info);
 
     static ErlNifFunc nif_funcs[] = {
-            {"Encoding_ANSEncodeDeltas", 2, nif_Encoding_ANSEncodeDeltas},
-            {"Encoding_ANSDecodeDeltas", 3, nif_Encoding_ANSDecodeDeltas},
+            {"encoding_ans_encode_deltas", 2, nif_Encoding_ANSEncodeDeltas},
+            {"encoding_ans_decode_deltas", 3, nif_Encoding_ANSDecodeDeltas},
     };
 
     ERL_NIF_INIT(echiapos_nif, nif_funcs, &on_load, NULL, NULL, NULL);
