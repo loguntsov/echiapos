@@ -24,13 +24,11 @@ ERL_NIF_TERM nif_Encoding_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NI
     }
 
     ErlNifBinary deltas_bin;
-
     if (!enif_inspect_binary(env, argv[0], &deltas_bin)) {
 	    return make_response(env, "error", "deltas_is_not_binary");
     }
 
     double R;
-
     if (!enif_get_double(env, argv[1], &R)) {
         return make_response(env, "error","R_is_not_float");
     }
@@ -58,8 +56,46 @@ ERL_NIF_TERM nif_Encoding_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NI
 }
 
 ERL_NIF_TERM nif_Encoding_ANSDecodeDeltas(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    // static std::vector<uint8_t> ANSDecodeDeltas(const uint8_t *inp, size_t inp_size, int numDeltas, double R)
-    return make_response(env, "error", "not_implemented");
+
+    if (argc != 3 ) {
+	    return enif_make_badarg(env);
+    }
+
+    ErlNifBinary deltas_bin;
+    if (!enif_inspect_binary(env, argv[0], &deltas_bin)) {
+	    return make_response(env, "error", "deltas_is_not_binary");
+    }
+
+    int numDeltas;
+    if (!enif_get_int(env, argv[1], &numDeltas)) {
+        return make_response(env, "error","NumDeltas_is_not_integer");
+    }
+
+    double R;
+    if (!enif_get_double(env, argv[2], &R)) {
+        return make_response(env, "error","R_is_not_float");
+    }
+
+    static std::vector<uint8_t> result;
+    try {
+        result = Encoding::ANSDecodeDeltas((uint8_t *) deltas_bin.data, deltas_bin.size, numDeltas, R);
+    } catch( std::exception *e) {
+        return make_response(env, "error", e->what());
+    }
+
+    char * buf = reinterpret_cast <char*> (&result[0]);
+    size_t size = result.size();
+
+    ErlNifBinary binary;
+    if (!enif_alloc_binary(size, &binary)) {
+        return make_response(env, "error", "memalloc");
+    }
+
+    memcpy((char *) binary.data, buf, size);
+
+    ERL_NIF_TERM response = enif_make_binary(env, &binary);
+
+    return enif_make_tuple2(env, enif_make_atom(env, "ok"), response);
 }
 
 
