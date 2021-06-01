@@ -7,9 +7,14 @@
 
 -compile(export_all).
 
+-spec ans_encode_deltas(binary(), float()) -> { ok, binary()} | { error, Reason :: atom()}.
 ans_encode_deltas(Deltas, R) ->
-  echiapos_nif:encoding_ans_encode_deltas(Deltas, R).
+  case echiapos_nif:encoding_ans_encode_deltas(Deltas, R) of
+    { ok, <<>>} -> { ok, Deltas };
+    Any -> Any
+  end.
 
+-spec ans_decode_deltas(binary(), integer(), float()) -> { ok, binary()} | { error, Reason :: atom()}.
 ans_decode_deltas(Binary, NumDeltas, R) ->
   echiapos_nif:encoding_ans_decode_deltas(Binary, NumDeltas, R).
 
