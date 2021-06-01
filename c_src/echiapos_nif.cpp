@@ -45,6 +45,15 @@ ERL_NIF_TERM nif_Encoding_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NI
         return make_response(env, "error", e->what());
     }
 
+    if (size==0) {
+        return enif_make_tuple2(env,
+            enif_make_atom(env, "ok"),
+            enif_make_tuple2(env,
+                enif_make_atom(env, "uncompressed"),
+                enif_make_binary(env, &deltas_bin)
+            ));
+    }
+
     ErlNifBinary binary;
     if (!enif_alloc_binary(size, &binary)) {
         return make_response(env, "error", "memalloc");
@@ -52,7 +61,12 @@ ERL_NIF_TERM nif_Encoding_ANSEncodeDeltas(ErlNifEnv* env, int argc, const ERL_NI
 
     memcpy((char *) binary.data, out, size);
     ERL_NIF_TERM response = enif_make_binary(env, &binary);
-    return enif_make_tuple2(env, enif_make_atom(env, "ok"), response);
+    return enif_make_tuple2(env,
+        enif_make_atom(env, "ok"),
+        enif_make_tuple2(env,
+            enif_make_atom(env, "compressed"),
+            response
+        ));
 }
 
 ERL_NIF_TERM nif_Encoding_ANSDecodeDeltas(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
